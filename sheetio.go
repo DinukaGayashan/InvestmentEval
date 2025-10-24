@@ -10,12 +10,12 @@ import (
 )
 
 var (
-	spreadsheet *sheets.Spreadsheet
-	loadOnce    sync.Once
-	loadError   error
+	cachedSpreadsheet *sheets.Spreadsheet
+	loadOnce          sync.Once
+	loadError         error
 )
 
-func GetSpreadsheet() (*sheets.Spreadsheet, error) {
+func getSpreadsheet() (*sheets.Spreadsheet, error) {
 	loadOnce.Do(func() {
 		ctx := context.Background()
 		sheetSrv, err := sheets.NewService(ctx, option.WithCredentialsFile(CredentialsFile))
@@ -23,24 +23,24 @@ func GetSpreadsheet() (*sheets.Spreadsheet, error) {
 			loadError = err
 			return
 		}
-		spreadsheet, loadError = sheetSrv.Spreadsheets.Get(SpreadsheetID).Do()
+		cachedSpreadsheet, loadError = sheetSrv.Spreadsheets.Get(SpreadsheetID).Do()
 	})
 	if loadError != nil {
 		return nil, loadError
 	}
-	return spreadsheet, nil
+	return cachedSpreadsheet, nil
 }
 
 func loadCurrentInvestments() ([]Investment, error) {
-	investments := []Investment{}
-	spreadsheet, err := GetSpreadsheet()
+	spreadsheet, err := getSpreadsheet()
 	if err != nil {
 		return nil, err
 	}
+	investments := []Investment{}
 	for _, sheet := range spreadsheet.Sheets {
-		if strings.HasPrefix(sheet.Properties.Title, CurrentPrefix) {
+		if after, ok := strings.CutPrefix(sheet.Properties.Title, CurrentPrefix); ok {
 			investments = append(investments, Investment{
-				Name:      strings.TrimPrefix(sheet.Properties.Title, CurrentPrefix),
+				Name:      after,
 				SheetName: sheet.Properties.Title,
 			})
 		}
