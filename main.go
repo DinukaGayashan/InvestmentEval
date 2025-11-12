@@ -9,7 +9,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to load current investments: %v", err)
 	}
-	for i, inv := range investments {
-		log.Printf("Loading investment %d: %s", i+1, inv.Name)
+	for _, inv := range investments {
+		log.Printf("%s: %d", inv.Name, len(inv.Transactions))
 	}
 }
