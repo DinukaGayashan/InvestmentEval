@@ -47,6 +47,23 @@ func loadCurrentInvestments() ([]Investment, error) {
 				Name:      after,
 				SheetName: sheet.Properties.Title,
 			})
+			currentValue, err := srv.Spreadsheets.Values.Get(SpreadsheetID, sheet.Properties.Title+CurrentValueCell).Do()
+			if err != nil {
+				return nil, err
+			}
+			if len(currentValue.Values) > 0 && len(currentValue.Values[0]) > 0 {
+				valStr := strings.TrimSpace(currentValue.Values[0][0].(string))
+				valStr = strings.ReplaceAll(valStr, ",", "")
+				currentVal := 0.0
+				if val, err := strconv.ParseFloat(valStr, 64); err == nil {
+					currentVal = val
+				} else {
+					fmt.Println("Error parsing current value: ", err)
+					continue
+				}
+				investments[len(investments)-1].CurrentValue = currentVal
+			}
+
 			transactions, err := readTransactions(sheet.Properties.Title)
 			if err != nil {
 				return nil, err
