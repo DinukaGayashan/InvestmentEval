@@ -10,4 +10,6 @@ const (
 	StatRange        = "!G4:G9"
 	DepositAction    = "DEPOSIT"
 	WithdrawAction   = "WITHDRAW"
+	DividendAction   = "DIVIDEND"
+	InterestAction   = "INTEREST"
 )
