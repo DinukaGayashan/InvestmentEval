@@ -7,7 +7,7 @@ const (
 	CurrentPrefix    = "CURR-"
 	CurrentValueCell = "!G4"
 	DataRange        = "!A5:C"
-	StatRange        = "!G4:G9"
+	StatRange        = "!G5:G11"
 	DepositAction    = "DEPOSIT"
 	WithdrawAction   = "WITHDRAW"
 	DividendAction   = "DIVIDEND"

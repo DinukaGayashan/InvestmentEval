@@ -9,14 +9,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to load current investments: %v", err)
 	}
-	for _, inv := range investments {
-		log.Printf("%s: %d", inv.Name, len(inv.Transactions))
-	}
 	statistics, err := processInvestments(investments)
 	if err != nil {
 		log.Fatalf("Failed to process investments: %v", err)
 	}
-	for _, stat := range statistics {
-		log.Println(stat)
+	err = uploadStatistics(statistics)
+	if err != nil {
+		log.Fatalf("Failed to upload statistics: %v", err)
 	}
 }

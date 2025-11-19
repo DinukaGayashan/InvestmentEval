@@ -115,3 +115,33 @@ func readTransactions(sheetName string) ([]Transaction, error) {
 	}
 	return transactions, nil
 }
+
+func uploadStatistics(statistics map[*Investment]Evaluation) error {
+	srv, err := getService()
+	if err != nil {
+		return err
+	}
+
+	for inv, eval := range statistics {
+		values := [][]any{{
+			eval.DurationDays,
+			eval.TotalDeposits,
+			eval.TotalWithdrawals,
+			eval.NetInvested,
+			eval.Gain,
+			eval.GainPct,
+			eval.GainAnnualizedPct,
+		}}
+
+		_, err := srv.Spreadsheets.Values.Update(SpreadsheetID, inv.SheetName+StatRange, &sheets.ValueRange{
+			Values:         values,
+			MajorDimension: "COLUMNS",
+		}).ValueInputOption("USER_ENTERED").Do()
+		if err != nil {
+			return err
+		}
+	}
+
+	return err
+
+}
