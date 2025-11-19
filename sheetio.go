@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
@@ -123,7 +124,9 @@ func uploadStatistics(statistics map[*Investment]Evaluation) error {
 	}
 
 	for inv, eval := range statistics {
-		values := [][]any{{
+		dateValue := [][]any{{time.Now().Format(DateLayout)}}
+
+		statValues := [][]any{{
 			eval.DurationDays,
 			eval.TotalDeposits,
 			eval.TotalWithdrawals,
@@ -133,15 +136,26 @@ func uploadStatistics(statistics map[*Investment]Evaluation) error {
 			eval.GainAnnualizedPct,
 		}}
 
-		_, err := srv.Spreadsheets.Values.Update(SpreadsheetID, inv.SheetName+StatRange, &sheets.ValueRange{
-			Values:         values,
-			MajorDimension: "COLUMNS",
-		}).ValueInputOption("USER_ENTERED").Do()
+		values := []*sheets.ValueRange{
+			{
+				Values: dateValue,
+				Range:  inv.SheetName + DateCell,
+			},
+			{
+				Values:         statValues,
+				Range:          inv.SheetName + StatRange,
+				MajorDimension: "COLUMNS",
+			},
+		}
+
+		_, err := srv.Spreadsheets.Values.BatchUpdate(SpreadsheetID, &sheets.BatchUpdateValuesRequest{
+			ValueInputOption: "USER_ENTERED",
+			Data:             values,
+		}).Do()
 		if err != nil {
 			return err
 		}
 	}
 
-	return err
-
+	return nil
 }

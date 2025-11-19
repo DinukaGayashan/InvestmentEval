@@ -5,6 +5,7 @@ const (
 	SpreadsheetID    = "1T6zivAyICtkLhqKOMbwp_fILAU2vobCmkWvKbVLIBYc"
 	DateLayout       = "2006-01-02"
 	CurrentPrefix    = "CURR-"
+	DateCell         = "!A1"
 	CurrentValueCell = "!G4"
 	DataRange        = "!A5:C"
 	StatRange        = "!G5:G11"
